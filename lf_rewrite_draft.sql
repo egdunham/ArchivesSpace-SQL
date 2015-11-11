@@ -1,3 +1,5 @@
+/* standardize your deacessioning or you might double-count deacessions */
+
 select sum(number), event_type_id
 
 from

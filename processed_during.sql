@@ -1,16 +1,32 @@
 
-/* THE "PROCESSED DURING" PART DOES NOT WORK */
+/* Mostly works - need to figure out how to display processing date and do a date range */
 
-select resource.identifier, resource.title, event.event_type_id, enumeration_value.value
+select distinct accession.id, accession.title, accession.content_description, 
+accession.identifier, extent.number
 
-from archivesspace.event_link_rlshp
+from accession
 
-join event on event.id = event_link_rlshp.event_id
+	right join extent 
+	on accession.id = extent.accession_id
 
-join enumeration_value on event.event_type_id = enumeration_value.id
+	left join archivesspace.deaccession
+	on accession.id = deaccession.accession_id
 
-join enumeration on enumeration_value.enumeration_id = enumeration.id
+	left join event_link_rlshp /* one to many */
+		on accession.id = event_link_rlshp.accession_id
 
-join resource on event_link_rlshp.resource_id = resource.id
 
-where enumeration_value.value = 'processed'
+
+	where exists (select 1
+					from event_link_rlshp
+					left join event on event_link_rlshp.event_id = event.id
+					left join date on date.event_id = event.id
+					where accession.id = event_link_rlshp.accession_id 
+						and (event.event_type_id = '313'
+						or event.event_type_id = '1514')
+					 and date.begin like '%2015%')
+
+	and extent.extent_type_id = 278
+
+	and (deaccession.scope_id is null 
+		or deaccession.scope_id = '923')

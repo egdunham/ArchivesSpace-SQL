@@ -1,20 +1,44 @@
-select sum(extent.number)
+select sum(unprocessed.lf)
 
-from archivesspace.accession right join archivesspace.extent 
-	on accession.id = extent.accession_id
+	from (select distinct
+		accession.id as id, 
+		accession.title as title, 
+		accession.content_description as descr, 
+		accession.identifier as accno, 
+		accession.repo_id as repo_id, 
+		extent.number as lf, 
+		extent.extent_type_id as type
 
-	left join archivesspace.collection_management
-	on accession.id = collection_management.accession_id
+		from accession
 	
-	left join archivesspace.user_defined
-	on accession.id = user_defined.accession_id
+		right join extent 
+			on accession.id = extent.accession_id
 
-	where extent.extent_type_id = 278
-	and (collection_management.processing_status_id is null 
-		or collection_management.processing_status_id != 257)
+		left join event_link_rlshp
+			on accession.id = event_link_rlshp.accession_id
 
-	and (user_defined.text_2 is null
-		or user_defined.text_2 != 'INV_AAO')
+		where not exists (select 1
+					from event_link_rlshp
+					left join event on event_link_rlshp.event_id = event.id
+					where accession.id = event_link_rlshp.accession_id 
+						and (event.event_type_id in ('313', '1514', '1515', '1512')))
+					) as unprocessed
 
-	and (user_defined.text_4 is null
-		or user_defined.text_4 != 'INV_AAO')
+		left join archivesspace.deaccession
+			on unprocessed.id = deaccession.accession_id
+
+		left join archivesspace.user_defined
+			on unprocessed.id = user_defined.accession_id
+
+		where unprocessed.type = 278
+		
+		/* Includes unprocessed collection inventories on AAO */
+
+		and (user_defined.text_2 is null
+			or user_defined.text_2 = 'INV_AAO')
+
+		and (user_defined.text_4 is null
+			or user_defined.text_4 = 'INV_AAO')
+
+		and (deaccession.scope_id is null 
+			or deaccession.scope_id = '923')

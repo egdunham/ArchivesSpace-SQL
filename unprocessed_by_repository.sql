@@ -1,6 +1,6 @@
 select sum(unprocessed.lf), repository.name
 
-	from (select distinct
+	from (select 
 		accession.id as id, 
 		accession.title as title, 
 		accession.content_description as descr, 
@@ -13,6 +13,7 @@ select sum(unprocessed.lf), repository.name
 	
 		right join extent 
 			on accession.id = extent.accession_id
+			and extent.extent_type_id = 278
 
 		left join event_link_rlshp
 			on accession.id = event_link_rlshp.accession_id
@@ -22,6 +23,9 @@ select sum(unprocessed.lf), repository.name
 					left join event on event_link_rlshp.event_id = event.id
 					where accession.id = event_link_rlshp.accession_id 
 						and (event.event_type_id in ('313', '1514', '1515', '1512')))
+
+		group by accession.id
+
 					) as unprocessed
 
 		left join archivesspace.deaccession
@@ -36,9 +40,7 @@ select sum(unprocessed.lf), repository.name
 		left join archivesspace.date
 			on unprocessed.id = date.accession_id
 
-		where unprocessed.type = 278
-
-		and (user_defined.text_2 is null
+		where (user_defined.text_2 is null
 			or user_defined.text_2 != 'INV_AAO')
 
 		and (user_defined.text_4 is null

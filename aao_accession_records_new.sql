@@ -1,8 +1,16 @@
-select distinct unprocessed.id, unprocessed.title, unprocessed.descr, 
-unprocessed.accno, unprocessed.lf, repository.name, deaccession.scope_id, 
-date.expression, date.begin, date.end, user_defined.text_2, user_defined.text_4
-
-/*Isolate all records that don't have a processing event */
+select
+	unprocessed.id, 
+	unprocessed.title, 
+	unprocessed.descr, 
+	unprocessed.accno, 
+	unprocessed.lf, 
+	repository.name, 
+	deaccession.scope_id, 
+	date.expression, 
+	date.begin, 
+	date.end, 
+	user_defined.text_2, 
+	user_defined.text_4
 
 from (select 
 		accession.id as id, 
@@ -14,9 +22,10 @@ from (select
 		extent.extent_type_id as type
 
 		from accession
-	
+
 		right join extent 
 			on accession.id = extent.accession_id
+			and extent.extent_type_id = '278'
 
 		left join event_link_rlshp
 			on accession.id = event_link_rlshp.accession_id
@@ -40,9 +49,7 @@ from (select
 		left join archivesspace.date
 			on unprocessed.id = date.accession_id
 
-		where unprocessed.type = 278
-
-		and (user_defined.text_2 is null
+		where (user_defined.text_2 is null
 			or user_defined.text_2 != 'INV_AAO')
 
 		and (user_defined.text_4 is null
@@ -50,3 +57,5 @@ from (select
 
 		and (deaccession.scope_id is null 
 			or deaccession.scope_id = '923')
+
+group by unprocessed.id

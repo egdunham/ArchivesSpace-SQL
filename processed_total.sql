@@ -40,4 +40,4 @@ from (select distinct
 		and (deaccession.scope_id is null 
 			or deaccession.scope_id = '923')
 
-		and (processed.id <> 0 or processed.id is null)
+		and (processed.id <> 0 or processed.id is not null)

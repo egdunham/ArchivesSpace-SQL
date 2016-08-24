@@ -24,7 +24,7 @@ select sum(unprocessed.lf)
 					from event_link_rlshp
 					left join event on event_link_rlshp.event_id = event.id
 					where accession.id = event_link_rlshp.accession_id 
-						and (event.event_type_id in ('313', '1514', '1515', '1512')))
+						and (event.event_type_id in ('313', '1514')))
 					) or event.event_type_id is null) as unprocessed
 
 		left join archivesspace.deaccession

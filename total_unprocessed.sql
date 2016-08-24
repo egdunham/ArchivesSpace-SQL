@@ -32,13 +32,13 @@ select sum(unprocessed.lf)
 
 		where unprocessed.type = 278
 		
-		/* Includes unprocessed collection inventories on AAO */
+		/* Exclude unprocessed collection inventories on AAO */
 
-		and (user_defined.text_2 is null
-			or user_defined.text_2 = 'INV_AAO')
+		and ((user_defined.text_4 is null 
+			or user_defined.text_4 not like 'INV_AAO')
 
-		and (user_defined.text_4 is null
-			or user_defined.text_4 = 'INV_AAO')
+			and (user_defined.text_2 is null 
+			or user_defined.text_2 not like 'INV_AAO'))
 
 		and (deaccession.scope_id is null 
 			or deaccession.scope_id = '923')

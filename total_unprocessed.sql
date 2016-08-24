@@ -1,6 +1,6 @@
 select sum(unprocessed.lf)
 
-	from (select distinct
+	from (select
 		accession.id as id, 
 		accession.title as title, 
 		accession.content_description as descr, 
@@ -25,7 +25,9 @@ select sum(unprocessed.lf)
 					left join event on event_link_rlshp.event_id = event.id
 					where accession.id = event_link_rlshp.accession_id 
 						and (event.event_type_id in ('313', '1514')))
-					) or event.event_type_id is null) as unprocessed
+					) or event.event_type_id is null
+
+			group by accession.id)  as unprocessed
 
 		left join archivesspace.deaccession
 			on unprocessed.id = deaccession.accession_id

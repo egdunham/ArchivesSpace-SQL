@@ -1,4 +1,3 @@
-/* Returns the number of special format items excluding photographs */
 select sum(extent.number), enumeration_value.value
 
 from archivesspace.accession
@@ -13,5 +12,6 @@ and enumeration_value.value != 'photographic_slides'
 and enumeration_value.value != 'Glass Plate Negatives'
 and enumeration_value.value != 'Photographs'
 and enumeration_value.value != 'Images'
+and (accession.id <> 0 and accession.id is not null)
 
 group by extent_type_id

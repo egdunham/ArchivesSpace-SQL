@@ -1,32 +1,30 @@
 
-/* Mostly works - need to figure out how to display processing date and do a date range */
+/* This returns properly no matter which one of the many is the 278.  It won't work if you use the same join trick twice?  */
 
-select distinct accession.id, accession.title, accession.content_description, 
-accession.identifier, extent.number
+select 
+	accession.id,
+	accession.title,
+	event_type_id, 
+	date.begin, 
+	extent.extent_type_id,
+	extent.number
 
 from accession
 
-	right join extent 
-	on accession.id = extent.accession_id
+	join extent 
+		on accession.id = extent.accession_id and extent_type_id = 278
 
-	left join archivesspace.deaccession
-	on accession.id = deaccession.accession_id
-
-	left join event_link_rlshp /* one to many */
+	left join event_link_rlshp
 		on accession.id = event_link_rlshp.accession_id
 
+	left join event
+		on event_link_rlshp.event_id = event.id
 
+	left join date
+		on date.event_id = event.id
 
-	where exists (select 1
-					from event_link_rlshp
-					left join event on event_link_rlshp.event_id = event.id
-					left join date on date.event_id = event.id
-					where accession.id = event_link_rlshp.accession_id 
-						and (event.event_type_id = '313'
-						or event.event_type_id = '1514')
-					 and date.begin like '%2015%')
+where event.event_type_id in ('313','1514')
 
-	and extent.extent_type_id = 278
+and date.begin between '2015-07-01' and '2016-06-30'
 
-	and (deaccession.scope_id is null 
-		or deaccession.scope_id = '923')
+group by accession.id

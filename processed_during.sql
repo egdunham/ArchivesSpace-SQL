@@ -2,6 +2,7 @@
 
 select 
 	accession.id,
+	repository.name,
 	accession.title,
 	event_type_id, 
 	date.begin, 
@@ -19,12 +20,11 @@ from accession
 	left join event
 		on event_link_rlshp.event_id = event.id and event.event_type_id in ('313','1514')
 
-
 	left join date
 		on date.event_id = event.id
 
+	join repository on accession.repo_id = repository.id
 
-
-where date.begin between '2015-07-01' and '2016-06-30'
+	where date.begin between '2015-07-01' and '2016-06-30'
 
 group by accession.id

@@ -12,7 +12,7 @@ from (select
 		from accession
 	
 		right join extent 
-			on accession.id = extent.accession_id
+			on accession.id = extent.accession_id and extent.extent_type_id = '278'
 
 		left join event_link_rlshp
 			on accession.id = event_link_rlshp.accession_id
@@ -30,9 +30,7 @@ from (select
 		left join archivesspace.user_defined
 			on processed.id = user_defined.accession_id
 
-		where processed.type = 278
-
-		and ((user_defined.text_4 is null 
+		where ((user_defined.text_4 is null 
 			or user_defined.text_4 not like 'INV_AAO')
 
 			and (user_defined.text_2 is null 

@@ -13,7 +13,7 @@ select sum(unprocessed.lf)
 		from accession
 	
 		right join extent 
-			on accession.id = extent.accession_id
+			on accession.id = extent.accession_id and extent.extent_type_id = '278'
 
 		left join event_link_rlshp
 			on accession.id = event_link_rlshp.accession_id
@@ -34,12 +34,10 @@ select sum(unprocessed.lf)
 
 		left join archivesspace.user_defined
 			on unprocessed.id = user_defined.accession_id
-
-		where unprocessed.type = 278
 		
 		/* Exclude unprocessed collection inventories on AAO */
 
-		and ((user_defined.text_4 is null 
+		where ((user_defined.text_4 is null 
 			or user_defined.text_4 not like 'INV_AAO')
 
 			and (user_defined.text_2 is null 

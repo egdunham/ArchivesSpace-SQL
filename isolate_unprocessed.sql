@@ -10,7 +10,7 @@ select
 		from accession
 	
 		right join extent 
-			on accession.id = extent.accession_id
+			on accession.id = extent.accession_id and extent.extent_type_id = '278'
 
 		left join event_link_rlshp
 			on accession.id = event_link_rlshp.accession_id

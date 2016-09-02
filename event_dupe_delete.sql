@@ -1,4 +1,4 @@
-select * 
+delete
 
 from event_link_rlshp
 

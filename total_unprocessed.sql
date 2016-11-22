@@ -7,27 +7,19 @@ select sum(unprocessed.lf)
 		accession.identifier as accno, 
 		accession.repo_id as repo_id, 
 		extent.number as lf, 
-		extent.extent_type_id as type,
-		event.event_type_id as eventtype
+		extent.extent_type_id as type
 
 		from accession
 	
 		right join extent 
 			on accession.id = extent.accession_id and extent.extent_type_id = '278'
 
-		left join event_link_rlshp
-			on accession.id = event_link_rlshp.accession_id
+		left join collection_management on collection_management.accession_id = accession.id
 
-		left join event on event_link_rlshp.event_id = event.id
+			where (collection_management.processing_status_id != 257
+					or collection_management.processing_status_id is null)
 
-		where (not exists (select 1
-					from event_link_rlshp
-					left join event on event_link_rlshp.event_id = event.id
-					where accession.id = event_link_rlshp.accession_id 
-						and (event.event_type_id in ('313', '1514')))
-					) or event.event_type_id is null
-
-			group by accession.id)  as unprocessed
+		)  as unprocessed
 
 		left join archivesspace.deaccession
 			on unprocessed.id = deaccession.accession_id

@@ -17,7 +17,7 @@ MAX(IF(enumeration_value.id = '281', extent.number, NULL)) as photo_slides,
 MAX(IF(enumeration_value.id = '282', extent.number, NULL)) as reels, 
 MAX(IF(enumeration_value.id = '1611', extent.number, NULL)) as vhs, 
 MAX(IF(enumeration_value.id = '1351', extent.number, NULL)) as videotapes, 
-location.title
+location.title, user_defined.text_2, user_defined.text_4
 
 from accession
 

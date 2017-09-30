@@ -5,9 +5,6 @@ from archival_object
 left join instance
 	on archival_object.id = instance.archival_object_id
 
-left join container
-	on instance.id = container.instance_id
-
 left join sub_container
 	on sub_container.instance_id = instance.id
 

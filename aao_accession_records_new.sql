@@ -10,7 +10,8 @@ select
 	date.begin, 
 	date.end, 
 	user_defined.text_2, 
-	user_defined.text_4
+	user_defined.text_4, 
+    collection_management.processing_status_id
 
 from (select 
 		accession.id as id, 
@@ -34,7 +35,7 @@ from (select
 					from event_link_rlshp
 					left join event on event_link_rlshp.event_id = event.id
 					where accession.id = event_link_rlshp.accession_id 
-						and (event.event_type_id in ('313', '1514', '1515', '1512')))
+						and (event.event_type_id in ('313', '1514')))
 					) as unprocessed
 
 		left join archivesspace.deaccession
@@ -48,6 +49,9 @@ from (select
 
 		left join archivesspace.date
 			on unprocessed.id = date.accession_id
+		
+        left join archivesspace.collection_management
+			on unprocessed.id = collection_management.accession_id
 
 		where (user_defined.text_2 is null
 			or user_defined.text_2 != 'INV_AAO')

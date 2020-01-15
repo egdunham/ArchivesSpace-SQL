@@ -54,10 +54,10 @@ from (select
 			on unprocessed.id = collection_management.accession_id
 
 		where (user_defined.text_2 is null
-			or user_defined.text_2 != 'INV_AAO')
+			or user_defined.text_2 NOT IN ('INV_AAO', 'Do not export'))
 
 		and (user_defined.text_4 is null
-			or user_defined.text_4 != 'INV_AAO')
+			or user_defined.text_4 NOT IN ('INV_AAO', 'Do not export'))
 
 		and (deaccession.scope_id is null 
 			or deaccession.scope_id = '923')

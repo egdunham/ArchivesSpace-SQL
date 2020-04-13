@@ -1,65 +1,52 @@
-select
-	unprocessed.id, 
-	unprocessed.title, 
-	unprocessed.descr, 
-	unprocessed.accno, 
-	unprocessed.lf, 
-	repository.name, 
-	deaccession.scope_id, 
-	date.expression, 
-	date.begin, 
-	date.end, 
-	user_defined.text_2, 
-	user_defined.text_4, 
-    collection_management.processing_status_id
+select * 
+	
+    from(select
+    accession.id,
+    repository.name as repo_name,
+    accession.title,
+    accession.content_description,
+    MAX(IF(enumeration_value.value like '%linear%', extent.number, NULL)) as lf, 
+    MAX(IF(event.event_type_id = 313, "TRUE", "FALSE")) as processed_1,
+    MAX(IF(event.event_type_id = 1514, "TRUE", "FALSE")) as processed_2,
+    MAX(IF(date.date_type_id = 905, date.expression, NULL)) as date,
+    MAX(IF(date.date_type_id = 905, date.begin, NULL)) as date_begin,
+    MAX(IF(date.date_type_id = 905, date.end, NULL)) as date_end,
+    MAX(IF(user_defined.text_2 like '%INV_AAO%' or user_defined.text_4 like '%INV_AAO%', "TRUE", "FALSE")) as on_aao,
+	accession.identifier as accno,
+    user_defined.text_2, 
+	user_defined.text_4,
+    IF(deaccession.scope_id = 922, "TRUE", "FALSE") as deaccessioned	
+	
+    from accession
 
-from (select 
-		accession.id as id, 
-		accession.title as title, 
-		accession.content_description as descr, 
-		accession.identifier as accno, 
-		accession.repo_id as repo_id, 
-		extent.number as lf, 
-		extent.extent_type_id as type
+	left join event_link_rlshp
+		on accession.id = event_link_rlshp.accession_id
 
-		from accession
+	left join event on event_link_rlshp.event_id = event.id
 
-		right join extent 
-			on accession.id = extent.accession_id
-			and extent.extent_type_id = '278'
+	left join extent
+		on accession.id = extent.accession_id
+	
+	left join enumeration_value 
+		on extent.extent_type_id = enumeration_value.id
 
-		left join event_link_rlshp
-			on accession.id = event_link_rlshp.accession_id
-
-		where not exists (select 1
-					from event_link_rlshp
-					left join event on event_link_rlshp.event_id = event.id
-					where accession.id = event_link_rlshp.accession_id 
-						and (event.event_type_id in ('313', '1514')))
-					) as unprocessed
-
-		left join archivesspace.deaccession
-			on unprocessed.id = deaccession.accession_id
-
-		left join archivesspace.user_defined
-			on unprocessed.id = user_defined.accession_id
-
-		left join archivesspace.repository
-			on unprocessed.repo_id = repository.id
-
-		left join archivesspace.date
-			on unprocessed.id = date.accession_id
-		
-        left join archivesspace.collection_management
-			on unprocessed.id = collection_management.accession_id
-
-		where (user_defined.text_2 is null
-			or user_defined.text_2 NOT IN ('INV_AAO', 'Do not export'))
-
-		and (user_defined.text_4 is null
-			or user_defined.text_4 NOT IN ('INV_AAO', 'Do not export'))
-
-		and (deaccession.scope_id is null 
-			or deaccession.scope_id = '923')
-
-group by unprocessed.id
+	left join repository
+		on accession.repo_id = repository.id
+	
+    left join user_defined
+		on accession.id = user_defined.accession_id
+	
+    left join archivesspace.deaccession
+		on accession.id = deaccession.accession_id
+	
+    left join archivesspace.date
+		on accession.id = date.accession_id
+	
+    group by accession.id, user_defined.text_2, user_defined.text_4, deaccessioned) as filter_values
+    
+    where filter_values.repo_name not in ("Thunderbird School of Global Management", "Architecture & Environmental Design Library")
+    
+	and filter_values.on_aao = "FALSE"
+    and filter_values.deaccessioned = "FALSE"
+    and filter_values.processed_1 = "FALSE"
+    and filter_values.processed_2 = "FALSE"

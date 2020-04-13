@@ -3,7 +3,7 @@
     repository.name,
     accession.title,
     accession.content_description,
-    MAX(IF(enumeration_value.value like '%Box%', extent.number, NULL)) as boxes, 
+    MAX(IF(enumeration_value.value like '%linear%', extent.number, NULL)) as lf, 
     MAX(IF(date.date_type_id = 905, date.expression, NULL)) as date,
     MAX(IF(date.date_type_id = 905, date.begin, NULL)) as date_begin,
     MAX(IF(date.date_type_id = 905, date.end, NULL)) as date_end,

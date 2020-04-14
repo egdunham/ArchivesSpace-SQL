@@ -1,14 +1,18 @@
- select
+select * 
+	
+    from(select
     accession.id,
-    repository.name,
+    repository.name as repo_name,
     accession.title,
     accession.content_description,
     MAX(IF(enumeration_value.value like '%linear%', extent.number, NULL)) as lf, 
+    MAX(IF(event.event_type_id = 313, "TRUE", "FALSE")) as processed_1,
+    MAX(IF(event.event_type_id = 1514, "TRUE", "FALSE")) as processed_2,
     MAX(IF(date.date_type_id = 905, date.expression, NULL)) as date,
     MAX(IF(date.date_type_id = 905, date.begin, NULL)) as date_begin,
     MAX(IF(date.date_type_id = 905, date.end, NULL)) as date_end,
     MAX(IF(user_defined.text_2 like '%INV_AAO%' or user_defined.text_4 like '%INV_AAO%', "TRUE", "FALSE")) as on_aao,
-	accession.identifier as accno, 
+	accession.identifier as accno,
     user_defined.text_2, 
 	user_defined.text_4,
     IF(deaccession.scope_id = 922, "TRUE", "FALSE") as deaccessioned	
@@ -38,4 +42,4 @@
     left join archivesspace.date
 		on accession.id = date.accession_id
 	
-    group by accession.id, user_defined.text_2, user_defined.text_4, deaccessioned
+    group by accession.id, user_defined.text_2, user_defined.text_4, deaccessioned) as filter_values

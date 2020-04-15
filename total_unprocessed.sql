@@ -1,41 +1,37 @@
-select sum(unprocessed.lf)
-
-	from (select
-		accession.id as id, 
-		accession.title as title, 
-		accession.content_description as descr, 
-		accession.identifier as accno, 
-		accession.repo_id as repo_id, 
-		extent.number as lf, 
-		extent.extent_type_id as type
-
-		from accession
+select filter_values.name, sum(filter_values.lf)
 	
-		right join extent 
-			on accession.id = extent.accession_id and extent.extent_type_id = '278'
+    from(select
+    accession.id,
+    repository.name as name,
+    MAX(IF(enumeration_value.value like '%linear%', extent.number, NULL)) as lf, 
+    MAX(IF(event.event_type_id = 313, "TRUE", "FALSE")) as processed_1,
+    MAX(IF(event.event_type_id = 1514, "TRUE", "FALSE")) as processed_2,
+    MAX(IF(user_defined.text_2 like '%INV_AAO%' or user_defined.text_4 like '%INV_AAO%', "TRUE", "FALSE")) as on_aao
 
-		left join collection_management on collection_management.accession_id = accession.id
+    from accession
 
-			where (collection_management.processing_status_id != 257
-					or collection_management.processing_status_id is null)
+	left join event_link_rlshp
+		on accession.id = event_link_rlshp.accession_id
 
-		)  as unprocessed
+	left join event on event_link_rlshp.event_id = event.id
 
-		left join archivesspace.deaccession
-			on unprocessed.id = deaccession.accession_id
+	left join extent
+		on accession.id = extent.accession_id
+	
+	left join enumeration_value 
+		on extent.extent_type_id = enumeration_value.id
 
-		left join archivesspace.user_defined
-			on unprocessed.id = user_defined.accession_id
-		
-		/* Exclude unprocessed collection inventories on AAO */
+	left join repository
+		on accession.repo_id = repository.id
+	
+    left join user_defined
+		on accession.id = user_defined.accession_id
 
-		where ((user_defined.text_4 is null 
-			or user_defined.text_4 not like 'INV_AAO')
+	group by accession.id, name
+    ) as filter_values
 
-			and (user_defined.text_2 is null 
-			or user_defined.text_2 not like 'INV_AAO'))
+where filter_values.processed_1 = "FALSE"
+and filter_values.processed_2 = "FALSE"
+and filter_values.on_aao = "FALSE"
 
-		and (deaccession.scope_id is null 
-			or deaccession.scope_id = '923')
-
-		and (unprocessed.id <> 0 and unprocessed.id is not null)
+group by name, processed_1, processed_2, on_aao

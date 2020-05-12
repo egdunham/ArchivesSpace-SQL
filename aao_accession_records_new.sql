@@ -52,3 +52,4 @@ select *
     and filter_values.processed_1 = "FALSE"
     and filter_values.processed_2 = "FALSE"
     and filter_values.no_publish = "FALSE"
+	and filter_values.title != "Audio-Visual Validation Record"

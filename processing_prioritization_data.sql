@@ -1,8 +1,23 @@
-select 
-unprocessed.accno, 
-unprocessed.title,
-
- (CASE WHEN assessment_attribute_definition.label='Housing Quality'
+select * 
+	
+    from(select
+    accession.id,
+    repository.name,
+    accession.title,
+    accession.content_description as descr,
+    MAX(IF(enumeration_value.value like '%linear%', extent.number, NULL)) as lf, 
+    MAX(IF(event.event_type_id = 313, "TRUE", "FALSE")) as processed_1,
+    MAX(IF(event.event_type_id = 1514, "TRUE", "FALSE")) as processed_2,
+    MAX(IF(date.date_type_id = 905, date.expression, NULL)) as date,
+    MAX(IF(date.date_type_id = 905, date.begin, NULL)) as begin,
+    MAX(IF(date.date_type_id = 905, date.end, NULL)) as end,
+    MAX(IF(user_defined.text_2 like '%INV_AAO%' or user_defined.text_4 like '%INV_AAO%', "TRUE", "FALSE")) as on_aao,
+    MAX(IF(user_defined.text_2 like '%Do not export%' or user_defined.text_4 like '%Do not export%', "TRUE", "FALSE")) as no_publish,
+	accession.identifier as accno,
+    user_defined.text_2, 
+	user_defined.text_4,
+    collection_management.processing_plan,
+    (CASE WHEN assessment_attribute_definition.label='Housing Quality'
             then assessment_attribute.value
             ELSE NULL 
         END) as housing,
@@ -21,47 +36,56 @@ unprocessed.title,
             then assessment_attribute.value
             ELSE NULL 
         END) as value, 
-unprocessed.repo_id, unprocessed.lf
-
-from
-
-(select
-		accession.id as id, 
-		accession.title as title, 
-		accession.content_description as descr, 
-		accession.identifier as accno, 
-		accession.repo_id as repo_id, 
-		extent.number as lf, 
-		extent.extent_type_id as type
-
-		from accession
+    
+    
+    IF(deaccession.scope_id = 922, "TRUE", "FALSE") as deaccessioned	
 	
-		right join extent 
-			on accession.id = extent.accession_id and extent.extent_type_id = '278'
+    from accession
 
-		left join collection_management on collection_management.accession_id = accession.id
+	left join event_link_rlshp
+		on accession.id = event_link_rlshp.accession_id
 
-			where (collection_management.processing_status_id != 257
-					or collection_management.processing_status_id is null)
+	left join event on event_link_rlshp.event_id = event.id
 
-		)  as unprocessed
+	left join extent
+		on accession.id = extent.accession_id
+	
+	left join enumeration_value 
+		on extent.extent_type_id = enumeration_value.id
 
-join assessment_rlshp 
-	on assessment_rlshp.accession_id = unprocessed.id
+	left join repository
+		on accession.repo_id = repository.id
+	
+    left join user_defined
+		on accession.id = user_defined.accession_id
+	
+    left join archivesspace.deaccession
+		on accession.id = deaccession.accession_id
+	
+    left join archivesspace.date
+		on accession.id = date.accession_id
+        
+	left join collection_management
+		on accession.id = collection_management.accession_id
+        
+        left join assessment_rlshp 
+	on assessment_rlshp.accession_id = accession.id
 
-join assessment 
+left join assessment 
 	on assessment_rlshp.assessment_id = assessment.id
 
-join assessment_attribute 
+left join assessment_attribute 
 	on assessment_attribute.assessment_id = assessment.id
 
-join assessment_attribute_definition
+left join assessment_attribute_definition
 	on assessment_attribute.assessment_attribute_definition_id = assessment_attribute_definition.id
+	
+    group by accession.id, user_defined.text_2, user_defined.text_4, deaccessioned, collection_management.processing_plan, assessment_attribute.value, assessment_attribute_definition.label) as filter_values
+    
+    where filter_values.name not in ("Thunderbird School of Global Management")
 
-left join archivesspace.deaccession
-			on unprocessed.id = deaccession.accession_id
-
-where (deaccession.scope_id is null 
-			or deaccession.scope_id = '923')
-
-and (unprocessed.id <> 0 and unprocessed.id is not null)
+    and filter_values.deaccessioned = "FALSE"
+    and filter_values.processed_1 = "FALSE"
+    and filter_values.processed_2 = "FALSE"
+    and filter_values.no_publish = "FALSE"
+	and filter_values.title != "Audio-Visual Validation Record"

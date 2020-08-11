@@ -2,42 +2,44 @@ select *
 	
     from(select
     accession.id,
-    repository.name,
     accession.title,
-    accession.content_description as descr,
-    MAX(IF(enumeration_value.value like '%linear%', extent.number, NULL)) as lf, 
+    (CASE WHEN assessment_attribute_definition.label='Housing Quality'
+            then assessment_attribute.value
+            ELSE NULL 
+        END) as housing,
+        
+        (CASE WHEN assessment_attribute_definition.label='Physical Condition'
+            then assessment_attribute.value
+            ELSE NULL 
+        END) as physicalcondition,
+        
+        (CASE WHEN assessment_attribute_definition.label='Physical Access (arrangement)'
+            then assessment_attribute.value
+            ELSE NULL 
+        END) as arrangement,
+        
+        (CASE WHEN assessment_attribute_definition.label='Research Value'
+            then assessment_attribute.value
+            ELSE NULL 
+        END) as value,
+        
+        repository.name,
+        MAX(IF(enumeration_value.value like '%linear%', extent.number, NULL)) as lf, 
+        accession.content_description as descr,
+        
+        MAX(IF(user_defined.text_2 like '%INV_AAO%' or user_defined.text_4 like '%INV_AAO%', "TRUE", "FALSE")) as on_aao,
+        collection_management.processing_plan,
+    
     MAX(IF(event.event_type_id = 313, "TRUE", "FALSE")) as processed_1,
     MAX(IF(event.event_type_id = 1514, "TRUE", "FALSE")) as processed_2,
     MAX(IF(date.date_type_id = 905, date.expression, NULL)) as date,
     MAX(IF(date.date_type_id = 905, date.begin, NULL)) as begin,
     MAX(IF(date.date_type_id = 905, date.end, NULL)) as end,
-    MAX(IF(user_defined.text_2 like '%INV_AAO%' or user_defined.text_4 like '%INV_AAO%', "TRUE", "FALSE")) as on_aao,
+    
     MAX(IF(user_defined.text_2 like '%Do not export%' or user_defined.text_4 like '%Do not export%', "TRUE", "FALSE")) as no_publish,
 	accession.identifier as accno,
     user_defined.text_2, 
 	user_defined.text_4,
-    collection_management.processing_plan,
-    (CASE WHEN assessment_attribute_definition.label='Housing Quality'
-            then assessment_attribute.value
-            ELSE NULL 
-        END) as housing,
-
- (CASE WHEN assessment_attribute_definition.label='Physical Condition'
-            then assessment_attribute.value
-            ELSE NULL 
-        END) as physicalcondition,
-
-(CASE WHEN assessment_attribute_definition.label='Physical Access (arrangement)'
-            then assessment_attribute.value
-            ELSE NULL 
-        END) as arrangement,
-        
-(CASE WHEN assessment_attribute_definition.label='Research Value'
-            then assessment_attribute.value
-            ELSE NULL 
-        END) as value, 
-    
-    
     IF(deaccession.scope_id = 922, "TRUE", "FALSE") as deaccessioned	
 	
     from accession

@@ -1,7 +1,7 @@
 select * 
 	
     from(select
-    accession.id,
+    accession.identifier as accno,
     accession.title,
     (CASE WHEN assessment_attribute_definition.label='Housing Quality'
             then assessment_attribute.value
@@ -29,7 +29,7 @@ select *
         
         MAX(IF(user_defined.text_2 like '%INV_AAO%' or user_defined.text_4 like '%INV_AAO%', "TRUE", "FALSE")) as on_aao,
         collection_management.processing_plan,
-    
+    accession.id,
     MAX(IF(event.event_type_id = 313, "TRUE", "FALSE")) as processed_1,
     MAX(IF(event.event_type_id = 1514, "TRUE", "FALSE")) as processed_2,
     MAX(IF(date.date_type_id = 905, date.expression, NULL)) as date,
@@ -37,7 +37,6 @@ select *
     MAX(IF(date.date_type_id = 905, date.end, NULL)) as end,
     
     MAX(IF(user_defined.text_2 like '%Do not export%' or user_defined.text_4 like '%Do not export%', "TRUE", "FALSE")) as no_publish,
-	accession.identifier as accno,
     user_defined.text_2, 
 	user_defined.text_4,
     IF(deaccession.scope_id = 922, "TRUE", "FALSE") as deaccessioned	

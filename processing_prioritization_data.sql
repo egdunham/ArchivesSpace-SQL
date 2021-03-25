@@ -1,3 +1,4 @@
+  
 select * 
 	
     from(select
@@ -32,6 +33,7 @@ select *
     accession.id,
     MAX(IF(event.event_type_id = 313, "TRUE", "FALSE")) as processed_1,
     MAX(IF(event.event_type_id = 1514, "TRUE", "FALSE")) as processed_2,
+    MAX(IF(collection_management.processing_status_id = 257, "TRUE", "FALSE")) as processed_3,
     MAX(IF(date.date_type_id = 905, date.expression, NULL)) as date,
     MAX(IF(date.date_type_id = 905, date.begin, NULL)) as begin,
     MAX(IF(date.date_type_id = 905, date.end, NULL)) as end,
@@ -88,5 +90,6 @@ left join assessment_attribute_definition
     and filter_values.deaccessioned = "FALSE"
     and filter_values.processed_1 = "FALSE"
     and filter_values.processed_2 = "FALSE"
+    and filter_values.processed_3 = "FALSE"
     and filter_values.no_publish = "FALSE"
 	and filter_values.title != "Audio-Visual Validation Record"

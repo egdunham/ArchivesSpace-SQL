@@ -18,8 +18,9 @@ select *
             then assessment_attribute.value
             ELSE NULL 
         END) as arrangement,
-        
-        (CASE WHEN assessment_attribute_definition.label='Research Value'
+	 
+        /* "Research Value" is also available, but is read-only and appears to be corrupt in some instances.  Interest is therefore used */
+        (CASE WHEN assessment_attribute_definition.label='Interest'
             then assessment_attribute.value
             ELSE NULL 
         END) as value,

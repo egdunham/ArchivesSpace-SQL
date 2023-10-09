@@ -9,7 +9,7 @@ client.authorize()
 #agent people, corporate_entities
 
 # Isolate the resource to be worked on
-resource = client.get(f'/repositories/4/resources/{656}').json()
+resource = client.get(f'/repositories/5/resources/{514}').json()
 
 # Walk tree and get identifiers of digital objects
 for obj in asnake.utils.walk_tree(resource, client):

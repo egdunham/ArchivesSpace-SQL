@@ -7,13 +7,13 @@ client = ASnakeClient()
 client.authorize()
 
 # Isolate the resource to be worked on
-resource = client.get(f'/repositories/5/resources/{514}').json()
+resource = client.get(f'/repositories/2/resources/{451}').json()
 
 # Walk tree
 for obj in asnake.utils.walk_tree(resource, client):
 
     if obj.get("component_id") is not None:
-        identifier = obj.get("component_id").replace("_", '-')
+        identifier = obj.get("component_id").replace("<_emph>", '')
         obj["component_id"] = identifier
 
         # Post updates

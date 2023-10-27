@@ -8,7 +8,7 @@ client.authorize()
 
 #agent people, corporate_entities
 
-agent_set = client.get(f'/agents/corporate_entities/3878').json()
+agent_set = client.get(f'/agents/people/7389').json()
 
 print(agent_set["used_within_published_repositories"])
 

@@ -51,7 +51,7 @@ def month_replace(exp):
 
 
 # Isolate the resource to be worked on
-resource = client.get(f'/repositories/2/resources/{637}').json()
+resource = client.get(f'/repositories/2/resources/{90}').json()
 
 # Walk tree and use expression value as start value
 for obj in asnake.utils.walk_tree(resource, client):
@@ -66,7 +66,7 @@ for obj in asnake.utils.walk_tree(resource, client):
         replace_value = date.get("expression")
 
         # Ignore "Undated"
-        if expression is not None and date_type == "single" and start is None and expression != "Undated":
+        if expression is not None and date_type == "inclusive" and start is None and expression != "Undated":
             monthRegex = re.compile(r'[A-Z]')
             dayRegex = re.compile(r'-\d$')
 
@@ -99,6 +99,7 @@ for obj in asnake.utils.walk_tree(resource, client):
 
             # Update begin string
             date["begin"] = replace_value
+            date["date_type"] = "single"
 
             # Post updates
             updated = client.post(obj['uri'], json=obj)

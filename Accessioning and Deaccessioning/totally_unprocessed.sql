@@ -1,6 +1,10 @@
-select sum(extent.number)
+select  unprocessed.accno
 
-	from (select distinct
+-- YOU SCREWED THIS UP - 7015 INCLUDES DUPES.  YOU'RE MISSING MORE THAN YOU THINK
+
+-- Includes materials with inventories on AAO and totally unprocessed materials
+
+from (select distinct
 		accession.id as id, 
 		accession.title as title, 
 		accession.content_description as descr, 
@@ -18,7 +22,7 @@ select sum(extent.number)
 		) as unprocessed
         
         -- Add linear feet
-        join extent on unprocessed.id = extent.accession_id
+        left join extent on unprocessed.id = extent.accession_id
         join enumeration_value on enumeration_value.id = extent.extent_type_id
 
         -- Remove deaccessioned collections
@@ -27,11 +31,8 @@ select sum(extent.number)
         
         left join user_defined on unprocessed.id = user_defined.accession_id
         
-        left join repository on repository.id = unprocessed.repo_id
-        
 		where enumeration_value.value like "%linear%"
         and (deaccession.scope_id is null or deaccession.scope_id = '923')
         and (user_defined.text_2 not like "%INV_AAO%" or user_defined.text_2 is null)
         and (user_defined.text_4 not like "%INV_AAO%" or user_defined.text_4 is null)
-
-
+       

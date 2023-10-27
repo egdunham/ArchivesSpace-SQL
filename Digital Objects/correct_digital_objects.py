@@ -9,7 +9,7 @@ client.authorize()
 #agent people, corporate_entities
 
 # Isolate the resource to be worked on
-resource = client.get(f'/repositories/5/resources/{514}').json()
+resource = client.get(f'/repositories/2/resources/{1235}').json()
 
 # Walk tree and get identifiers of digital objects
 for obj in asnake.utils.walk_tree(resource, client):
@@ -18,27 +18,37 @@ for obj in asnake.utils.walk_tree(resource, client):
     for item in instance:
 
         # Retrieve digital object(s) using provided URIs
-        dig_obj_ref = item.get("digital_object")["ref"]
-        dig_obj = client.get(f'{dig_obj_ref}').json()
+        if item.get("digital_object") is not None:
+            dig_obj_ref = item.get("digital_object")["ref"]
+            dig_obj = client.get(f'{dig_obj_ref}').json()
 
-        # Reformat identifier and replace
-        identifier = dig_obj.get("file_versions")[1]["file_uri"].replace("http://www.asu.edu/lib/archives/digital-collections/AZSI/full/", "")
-        new_identifier = identifier.replace(".JPG", "")
-        dig_obj["digital_object_id"] = new_identifier
+            # Reformat identifier and replace
+            identifier = dig_obj.get("digital_object_id")
+            new_identifier = "CP_SPC_W_" + identifier
+            dig_obj["digital_object_id"] = new_identifier
 
-        # Remove ", Digital Object" from title
+            # Set level and type
+            dig_obj["level"] = "image"
+            dig_obj["digital_object_type"] = "still_image"
 
-        title = dig_obj["title"]
+            # Set use statement and format
+            file_version = dig_obj.get("file_versions")
+            for version in file_version:
 
-        dig_obj["title"] = title.replace(", Digital Object", "")
+                version["file_format_name"] = "jpeg"
 
-        #print(dig_obj)
+                if version["xlink_actuate_attribute"] == "onRequest":
+                    version["use_statement"] = "image-service"
 
-        # Update using digital object URI
-        updated = client.post(dig_obj['uri'], json=dig_obj)
+                if version["xlink_actuate_attribute"] == "onLoad":
+                    version["use_statement"] = "image-thumbnail"
 
-        if updated.status_code == 200:
-            print("Digital object {} updated".format(dig_obj['uri']))
-        else:
-            print(updated.json())
 
+            #print(dig_obj)
+
+            updated = client.post(dig_obj['uri'], json=dig_obj)
+
+            if updated.status_code == 200:
+                print("Archival object {} updated".format(dig_obj['uri']))
+            else:
+                print(updated.json())

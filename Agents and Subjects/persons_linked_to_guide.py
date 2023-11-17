@@ -7,7 +7,7 @@ client = ASnakeClient()
 client.authorize()
 
 # Isolate the resource to be worked on
-resource = client.get(f'/repositories/2/resources/{1235}').json()
+resource = client.get(f'/repositories/2/resources/{1263}').json()
 
 # Walk tree and print display name and URI of associated agent
 for resource in asnake.utils.walk_tree(resource, client):

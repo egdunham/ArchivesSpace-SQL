@@ -1,8 +1,4 @@
-select  unprocessed.accno
-
--- YOU SCREWED THIS UP - 7015 INCLUDES DUPES.  YOU'RE MISSING MORE THAN YOU THINK
-
--- Includes materials with inventories on AAO and totally unprocessed materials
+select  sum(extent.number)
 
 from (select distinct
 		accession.id as id, 

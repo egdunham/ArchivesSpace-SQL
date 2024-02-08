@@ -9,7 +9,7 @@ client.authorize()
 #agent people, corporate_entities
 
 # Isolate the resource to be worked on
-resource = client.get(f'/repositories/2/resources/{1235}').json()
+resource = client.get(f'/repositories/4/resources/{1347}').json()
 
 # Walk tree and get identifiers of digital objects
 for obj in asnake.utils.walk_tree(resource, client):
@@ -24,7 +24,7 @@ for obj in asnake.utils.walk_tree(resource, client):
 
             # Reformat identifier and replace
             identifier = dig_obj.get("digital_object_id")
-            new_identifier = "CP_SPC_W_" + identifier
+            new_identifier = "UP_ASUA_" + identifier
             dig_obj["digital_object_id"] = new_identifier
 
             # Set level and type

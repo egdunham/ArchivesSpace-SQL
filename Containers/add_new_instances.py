@@ -11,7 +11,7 @@ client.authorize()
 # Read in CSV - format as [refid][container uri]
 archival_object_csv = os.path.normpath(r"C:\Users\egdunham\Dropbox (ASU)\__MyFiles\Desktop\job_1960_file_2361.csv")
 
-#Open CSV reader
+#Open CSV files
 with open(archival_object_csv,'r') as csvfile:
     reader = csv.reader(csvfile)
 

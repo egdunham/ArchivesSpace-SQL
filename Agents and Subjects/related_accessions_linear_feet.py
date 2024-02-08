@@ -13,7 +13,7 @@ client.authorize()
 lf = 0
 boxes = 0
 
-resource = client.get(f'/repositories/4/resources/{1273}').json()
+resource = client.get(f'/repositories/4/resources/{1358}').json()
 accession = resource.get("related_accessions")
 
 for item in accession:

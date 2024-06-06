@@ -1,4 +1,4 @@
-select distinct *
+select sum(extent.number)
 
 -- Includes materials with inventories on AAO and totally unprocessed materials
 

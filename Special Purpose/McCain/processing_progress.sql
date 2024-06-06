@@ -1,0 +1,1 @@
+select Discard, count(*) as count from master_md5_set where original_media_id not in ("ms_cm_mss_114","ms_cm_mss_409_186") group by Discard

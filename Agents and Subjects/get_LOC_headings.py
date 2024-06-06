@@ -23,6 +23,7 @@ with open(csv_output,'w', newline='', encoding="utf-8") as csvout:
         # Establish search terms
         for row in reader:
             toSearch = row[0]
+            #toSearch = row[0]
 
             # Run search using the suggest feature
             # SEE IF YOU CAN MAKE THIS LESS BROAD - MATCH THE STRING WHEN YOU ADD

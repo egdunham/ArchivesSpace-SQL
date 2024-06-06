@@ -10,7 +10,7 @@ from asnake.client import ASnakeClient
 
 client = ASnakeClient()
 client.authorize()
-
+# THIS IS EASIER AND FASTER TO DO VIA SQL
 merge_output = os.path.normpath(r"C:\Users\egdunham\Dropbox (ASU)\__MyFiles\Desktop\names.csv")
 
 # Isolate the resource to be worked on /repositories/:repo_id/jobs/active

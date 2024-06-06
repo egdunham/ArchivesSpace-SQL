@@ -10,7 +10,7 @@ client = ASnakeClient()
 client.authorize()
 
 # Read in CSV - format as [refid][expression][start]
-archival_object_csv = os.path.normpath(r"C:\Users\egdunham\Dropbox (ASU)\__MyFiles\Desktop\date_update.csv")
+archival_object_csv = os.path.normpath(r"C:\Users\egdunham\Dropbox (ASU)\__MyFiles\Desktop\metrocanal.csv")
 
 #Open CSV reader and ignore header row
 with open(archival_object_csv,'r') as csvfile:
@@ -18,19 +18,20 @@ with open(archival_object_csv,'r') as csvfile:
     next(reader, None)
 
     for row in reader:
-        refid = row[0]
+        #refid = row[0]
 
         # Isolate the resource to be worked on using find_by_id
 
-        ao = client.get(refid).json()
+        ao = client.get(f"/repositories/9/archival_objects/{row[0]}").json()
 
         # Get dates
         resource_dates = ao.get("dates")
 
         for date in resource_dates:
-            date["begin"] = row[2]
-            date["expression"] = row[1]
-
+            #date["begin"] = row[2]
+            #date["expression"] = row[1]
+            #date["end"] = row[3]
+            date["certainty"] = "approximate"
 
         # Post updates
         updated = client.post(ao['uri'], json=ao)

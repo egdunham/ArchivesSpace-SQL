@@ -14,13 +14,13 @@ client.authorize()
 csv_output = os.path.normpath(r"C:\Users\egdunham\Dropbox (ASU)\__MyFiles\Desktop\csv_output.csv")
 
 # Isolate the resource to be worked on
-resource = client.get(f'/repositories/4/resources/{1054}').json()
+resource = client.get(f'/repositories/2/resources/{73}').json()
 
 
 with open(csv_output,'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
     # write CSV header row
-    writer.writerow(["date", "num"])
+    writer.writerow(["date", "num", "ref"])
 
     # Walk tree and isolate name headings in <odd> notes
     for obj in asnake.utils.walk_tree(resource, client):
@@ -41,7 +41,7 @@ with open(csv_output,'w', newline='') as csvfile:
                 box = client.get(ref).json()
                 num = box.get("indicator")
 
-                row = [expression, num]
+                row = [expression, num, ref]
 
                 # Write row to file
                 writer.writerow(row)

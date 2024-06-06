@@ -1,0 +1,12 @@
+UPDATE master_md5_set
+SET Discard = "Processed"
+WHERE id IN (858295,
+860531,
+862231,
+877744,
+880214,
+882114,
+907102,
+908482,
+912488,
+953939)

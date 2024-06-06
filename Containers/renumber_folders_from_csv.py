@@ -9,7 +9,7 @@ client = ASnakeClient()
 client.authorize()
 
 # Read in CSV - format as [refid][container uri]
-archival_object_csv = os.path.normpath(r"C:\Users\egdunham\Dropbox (ASU)\__MyFiles\Desktop\renumber_csv.csv")
+archival_object_csv = os.path.normpath(r"C:\Users\egdunham\Dropbox (ASU)\__MyFiles\Desktop\metrocanal.csv")
 
 #Open CSV reader and ignore header row
 with open(archival_object_csv,'r') as csvfile:
@@ -20,11 +20,7 @@ with open(archival_object_csv,'r') as csvfile:
         refid = row[0]
 
         # Isolate the resource to be worked on using find_by_id
-        url = 'repositories/2/find_by_id/archival_objects?ref_id[]=' + refid
-        ao = client.get(url).json()
-        # get archival object as json
-        ao_ref = ao.get("archival_objects")[0].get("ref")
-        ao = client.get(ao_ref).json()
+        ao = client.get(f"/repositories/9/archival_objects/{row[0]}").json()
 
         #Isolate top container
         instance = ao.get("instances")
@@ -39,7 +35,7 @@ with open(archival_object_csv,'r') as csvfile:
 
             #pprint(ao_ref)
 
-            updated = client.post(ao_ref, json=ao)
+            updated = client.post(ao['uri'], json=ao)
 
             if updated.status_code == 200:
                 print("Archival object {} updated".format(ao['uri']))

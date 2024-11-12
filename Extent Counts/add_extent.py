@@ -8,10 +8,7 @@ from asnake.client import ASnakeClient
 client = ASnakeClient()
 client.authorize()
 
-
-# Set file of names to search
 archival_object_csv = os.path.normpath(r"C:\Users\egdunham\OneDrive - Arizona State University/Desktop/input.csv")
-
 
 with open(archival_object_csv,'r', encoding='utf-8-sig') as csvin:
     reader = csv.reader(csvin)
@@ -20,21 +17,11 @@ with open(archival_object_csv,'r', encoding='utf-8-sig') as csvin:
     # Establish search terms
     for row in reader:
         id = row[0]
-
         ao = client.get(f"{id}").json()
-        note = ao.get("notes")
+        extent = ao.get("extents")
 
-        for item in note:
-            if item["type"] == "physdesc":
-                item["content"] = [row[1]]
-
-
-
-
-
-
-
-
+        newExtent = {'extent_type': 'Videotape(s): VHS', 'jsonmodel_type': 'extent', 'number': '1', 'portion': 'whole'}
+        extent.append(newExtent)
 
         # Post updates
         updated = client.post(ao["uri"], json=ao)

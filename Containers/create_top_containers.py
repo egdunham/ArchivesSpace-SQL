@@ -1,13 +1,10 @@
+import csv
 import os
 from pprint import pprint
 
 import asnake.utils
-
-# ORIGINAL SET The 2 column CSV should look like this (without a header row):
-# [ASpace ref_id],[repo_processing_note]
-
-# archival_object_csv formatted as [refid][box][folder]
-archival_object_csv = os.path.normpath("c:/users/nh48/desktop/ASpace_api_docs/notes_to_add.csv")
+csv_output = os.path.normpath(r"C:\Users\egdunham\OneDrive - Arizona State University/Desktop/csv_output.csv")
+archival_object_csv = os.path.normpath(r"C:\Users\egdunham\OneDrive - Arizona State University/Desktop/input.csv")
 
 # Authenticate via asnake
 from asnake.client import ASnakeClient
@@ -15,26 +12,42 @@ from asnake.client import ASnakeClient
 client = ASnakeClient()
 client.authorize()
 
-# Create some number of new top containers
-#for i in (30, 689):
-   # container_data = {"indicator": str(i),
-                      #"type": "Box"}
+with open(archival_object_csv,'r') as csvfile:
+    reader = csv.reader(csvfile)
+    next(reader, None)
 
-boxes = ["294a", "294b", "294c", "294d", "319a", "369a", "374a", "376a", "380a", "467a"]
-for x in boxes:
-    container_data = {"indicator": x,
-                       "type": "Box"}
+    for row in reader:
+        refid = row[0]
+        ao = client.get(refid).json()
 
-    new_container = client.post("repositories/2/top_containers", json=container_data).json()
-    #print(new_container)
+        # Replace "Tape "
+        component = ao.get("component_id")
+        update_component = component.replace("Tape ", "")
+        updateInstance = ao.get("instances")
 
+        # Create new container and clear component_id
+        container_data = {'jsonmodel_type': 'top_container',
+                          'indicator': update_component,
+                          'type': 'Tape',
+                          'barcode': row[1]}
 
+        new_container = client.post("repositories/4/top_containers", json=container_data).json()
+        ao["component_id"] = ""
 
-    #CAN FIX TO USE STATUS CODE
-    if new_container.get('error'):
-        print(new_container['error'])
-    else:
-        print(container_data["indicator"],"|",new_container["uri"])
+        # Create and append new instance
+        newInstance = {'instance_type': 'moving_images',
+                       'is_representative': False,
+                       'jsonmodel_type': 'instance',
+                       'sub_container': {'jsonmodel_type': 'sub_container',
+                                         'top_container': {'jsonmodel_type': 'top_container',
+                                                           'ref': new_container.get("uri")}}
+                       }
 
+        updateInstance.append(newInstance)
 
-        #print("Box {} URI {} created".format(new_container["indicator"], new_container["uri"]))
+        updated = client.post(ao['uri'], json=ao)
+
+        if updated.status_code == 200:
+            print("Archival object {} updated".format(ao['uri']))
+        else:
+            pprint(updated.json())

@@ -22,19 +22,16 @@ with open(archival_object_csv,'r') as csvfile:
         refid = row[0]
         topContainer = row[1]
         ao = client.get(refid).json()
-        pprint(ao)
+
         updateInstance = ao.get("instances")
 
-        # Add new instance with top container
-        newInstance = {'instance_type': 'mixed_materials',
-                       'is_representative': False,
-                       'jsonmodel_type': 'instance',
-                       'sub_container': {'jsonmodel_type': 'sub_container',
-                                         'top_container': {'jsonmodel_type': 'top_container',
-                                                           'ref': row[1]}}
-                       }
+        for item in updateInstance:
+            subcontainer = item.get("sub_container")
+            topcontainer = subcontainer.get("top_container")
 
-        updateInstance.append(newInstance)
+            for item in topcontainer:
+
+                topcontainer["ref"] = row[1]
 
         updated = client.post(ao['uri'], json=ao)
 

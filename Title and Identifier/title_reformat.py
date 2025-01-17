@@ -11,7 +11,7 @@ client = ASnakeClient()
 client.authorize()
 
 # Read in CSV - format as [refid][expression][start]
-archival_object_csv = os.path.normpath(r"C:\Users\egdunham\Dropbox (ASU)\__MyFiles\Desktop\fannin.csv")
+archival_object_csv = os.path.normpath(r"C:\Users\egdunham\OneDrive - Arizona State University/Desktop/input.csv")
 
 #Open CSV reader and ignore header row
 with open(archival_object_csv,'r') as csvfile:
@@ -20,10 +20,11 @@ with open(archival_object_csv,'r') as csvfile:
 
     for row in reader:
         refid = row[0]
+        #pprint(refid)
 
         # Isolate the resource to be worked on using find_by_id
         ao = client.get(f"/repositories/2/archival_objects/{row[0]}").json()
-
+        #pprint(ao)
         # Get dates
         title = ao.get("title")
         display = ao.get("display_string")

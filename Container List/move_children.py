@@ -26,7 +26,7 @@ with open(archival_object_csv,'r') as csvfile:
     #add_to = client.get(f'/repositories/4/archival_objects/381741/accept_children').json()
     for row in reader:
         children = children + row[0]
-        move_ao = client.post('/repositories/4/archival_objects/378328/accept_children',
+        move_ao = client.post('/repositories/4/archival_objects/381741/accept_children',
                           params={"children": [row[0]],
                                   "position": 41}).json()
         print(move_ao)

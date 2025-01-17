@@ -18,7 +18,7 @@ with open(csv_output,'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
 
     # write CSV header row
-    writer.writerow(["archival_object_uri", "title", "display string", "date"])
+    writer.writerow(["archival_object_uri", "title", "date", "box", "folder", "subseries"])
 
     #Open CSV reader and ignore header row
     with open(archival_object_csv,'r') as csvfile:
@@ -28,26 +28,35 @@ with open(csv_output,'w', newline='') as csvfile:
         for row in reader:
             # Isolate the resource to be worked on using find_by_id
             resource = client.get(f'/{row[0]}/children').json()
-            #subseries = row[1]
+            subseries = row[1]
             for item in resource:
                 #record = client.get(f'/repositories/2/archival_objects/{item}').json()
                 # URI and title
 
                 uri = item["uri"]
                 title = item["title"]
-                display = item["display_string"]
                 itemDate = ""
 
                 if item["dates"]:
                     for date in item.get("dates"):
                         itemDate = date.get("expression")
 
-                #note = record.get("notes")
+                if item["instances"]:
+                    box = ""
+                    folder = ""
 
-                #if note:
-                    #for id in note:
-                        #content = id.get("content")
+                    for instance in item.get("instances"):
+                        if instance.get("sub_container"):
+                            subcontainer = instance.get("sub_container")
 
-                row = [uri, title, display, itemDate]
+                            if subcontainer.get("indicator_2"):
+                                folder = subcontainer["indicator_2"]
+
+                            if subcontainer.get("top_container"):
+                                topcontainer = client.get(subcontainer.get("top_container")["ref"]).json()
+                                box = topcontainer["indicator"]
+
+
+
+                row = [uri, title, itemDate, box, folder, subseries]
                 writer.writerow(row)
-                #print(uri,"|",title,"|",itemDate)

@@ -18,50 +18,49 @@ with open(csv_output,'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
 
     # write CSV header row
-    writer.writerow(["archival_object_uri", "box", "folder"])
+    writer.writerow(["archival_object_uri", "title", "display"])
 
     #Open CSV reader and ignore header row
-    with open(csv_input,'r') as csvfile:
-        reader = csv.reader(csvfile)
-        next(reader, None)
+    #with open(csv_input,'r') as csvfile:
+        #reader = csv.reader(csvfile)
+        #next(reader, None)
 
-        for row in reader:
+        #for row in reader:
+    search = "render=italic>"
 
-            results = client.get(
-                "repositories/6/search",
-                params={
-                    "q": {f"{row[0]}"},
-                    "page": 1,
-                    "page_size": 100,
-                },
-            ).json()
+    results = client.get(
+        "repositories/2/search",
+        params={
 
-            isolateResults = results.get("results")
+            "q": "title: italic",
 
-            for item in isolateResults:
+            "page": 1,
+            "page_size": 100,
 
-                folderNo = ""
-                boxURI = ""
-                # Parse returned string into JSON
-                individualJSON = json.loads(item.get("json"))
+            "root_record": "/repositories/2/resources/919"
 
-                # Pull out fields
-                uri = individualJSON.get("uri")
+        }
 
-                if individualJSON.get("instances"):
-                    instances = individualJSON.get("instances")
 
-                    for instance in instances:
+    ).json()
+    pprint(results)
 
-                        if instance["instance_type"] == "mixed_materials":
-                            #pprint(instance)
-                            subcontainer = instance.get("sub_container")
+    isolateResults = results.get("results")
 
-                            if subcontainer.get("indicator_2"):
-                                folderNo = subcontainer["indicator_2"]
+    for item in isolateResults:
 
-                            topcontainer = subcontainer.get("top_container")
-                            boxURI = topcontainer.get("ref")
+        # Parse returned string into JSON
+        individualJSON = json.loads(item.get("json"))
 
-                        row = [uri, boxURI, folderNo]
-                        writer.writerow(row)
+        #if individualJSON.get("level") == "file":
+            #pprint(individualJSON["display_string"])
+
+        # Pull out fields
+        uri = individualJSON.get("uri")
+        boxURI = individualJSON.get("title")
+
+        row = [uri, boxURI, individualJSON["display_string"]]
+        writer.writerow(row)
+
+
+

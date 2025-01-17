@@ -15,11 +15,11 @@ processedLF = 0
 unprocessedLF = 0
 aaoLF = 0
 
-resourceSet = client.get(f'/repositories/4/accessions?all_ids=true').json()
+resourceSet = client.get(f'/repositories/2/accessions?all_ids=true').json()
 
 for id in resourceSet:
 
-    accession = client.get(f'/repositories/4/accessions/{id}').json()
+    accession = client.get(f'/repositories/2/accessions/{id}').json()
 
     # Set variables for determining AAO vs. totally unprocessed and linear feet to add
     isProcessed = False
@@ -77,3 +77,4 @@ for id in resourceSet:
 print("Linear Feet Processed:", processedLF)
 print("Linear Feet Unprocessed:", unprocessedLF)
 print("Linear Feet on AAO:", aaoLF)
+print("Linear Feet Unprocessed and Partially Processed:", unprocessedLF + aaoLF)

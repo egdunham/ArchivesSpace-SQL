@@ -18,7 +18,7 @@ with open(csv_output,'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
 
     # write CSV header row
-    writer.writerow(["archival_object_uri", "title", "display string", "date"])
+    writer.writerow(["archival_object_uri", "title", "display string", "date", "component id"])
 
     #Open CSV reader and ignore header row
     with open(archival_object_csv,'r') as csvfile:
@@ -27,7 +27,7 @@ with open(csv_output,'w', newline='') as csvfile:
 
         for row in reader:
             # Isolate the resource to be worked on using find_by_id
-            resource = client.get(f'/{row[0]}/children').json()
+            resource = client.get(f'/repositories/2/archival_objects/1265848/children').json()
             #subseries = row[1]
             for item in resource:
                 #record = client.get(f'/repositories/2/archival_objects/{item}').json()
@@ -37,17 +37,22 @@ with open(csv_output,'w', newline='') as csvfile:
                 title = item["title"]
                 display = item["display_string"]
                 itemDate = ""
+                component = ""
+
+                pprint(item)
 
                 if item["dates"]:
                     for date in item.get("dates"):
                         itemDate = date.get("expression")
 
+                if item["component_id"]:
+                    component = item["component_id"]
                 #note = record.get("notes")
 
                 #if note:
                     #for id in note:
                         #content = id.get("content")
 
-                row = [uri, title, display, itemDate]
+                row = [uri, title, display, itemDate, component]
                 writer.writerow(row)
                 #print(uri,"|",title,"|",itemDate)

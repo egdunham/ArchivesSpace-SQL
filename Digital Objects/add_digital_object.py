@@ -26,28 +26,41 @@ with open(archival_object_csv,'r') as csvfile:
 
         # Create new digital object
         newObject = {
-            'collection': [{'ref': '/repositories/4/resources/1054'}],
-            'digital_object_id': "ms_um_mss_191_" + row[2],
-            'digital_object_type': 'text',
-            'file_versions': [{
-                               'file_format_name': 'jpeg',
-                               'file_uri': row[1] + "/acdmrn.html",
-                               'is_representative': False,
-                               'jsonmodel_type': 'file_version',
-                               'publish': False,
-                               'use_statement': 'text-data',
-                               'xlink_actuate_attribute': 'onRequest',
-                               'xlink_show_attribute': 'new'}],
+            'collection': [{'ref': '/repositories/2/resources/444'}],
+            'digital_object_id': "cp_spc_63_" + row[2],
+            'digital_object_type': 'still_image',
+            'file_versions': [
+                {
+                   'file_format_name': 'jpeg',
+                   'file_uri': row[4],
+                   'is_representative': False,
+                   'jsonmodel_type': 'file_version',
+                   'publish': False,
+                   'use_statement': 'image-thumbnail',
+                   'xlink_actuate_attribute': 'onRequest',
+                   'xlink_show_attribute': 'new'
+                },
+                {
+                    'file_format_name': 'jpeg',
+                    'file_uri': row[3],
+                    'is_representative': False,
+                    'jsonmodel_type': 'file_version',
+                    'publish': False,
+                    'use_statement': 'image-service',
+                    'xlink_actuate_attribute': 'onRequest',
+                    'xlink_show_attribute': 'new'
+                }
+            ],
             'is_slug_auto': False,
             'jsonmodel_type': 'digital_object',
             'level': 'image',
             'linked_instances': [{'ref': row[0]}],
-            'repository': {'ref': '/repositories/4'},
-            'title': 'Academic Affairs Policies and Procedures Manual'
+            'repository': {'ref': '/repositories/2'},
+            'title': row[1]
         }
 
         # Create digital object and get URI
-        newObject = client.post(f'/repositories/4/digital_objects', json=newObject)
+        newObject = client.post(f'/repositories/2/digital_objects', json=newObject)
 
         objURI = newObject.json()
 

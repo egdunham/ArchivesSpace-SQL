@@ -1,3 +1,6 @@
+import csv
+import os
+
 import asnake.utils
 
 # Authenticate via asnake
@@ -6,31 +9,32 @@ from asnake.client import ASnakeClient
 client = ASnakeClient()
 client.authorize()
 
-PHOTOGRAPHERS = ["/agents/people/6039", "/agents/people/1901", "/agents/people/4601", "/agents/people/6030"]
+archival_object_csv = os.path.normpath(r"C:\Users\egdunham\OneDrive - Arizona State University/Desktop/input.csv")
 
-# Isolate the resource to be worked on
-resource = client.get(f'/repositories/4/resources/{656}').json()
+#Open CSV reader and ignore header row
+with open(archival_object_csv, 'r') as csvfile:
+    reader = csv.reader(csvfile)
+    next(reader, None)
 
-# Walk tree and print display name and URI of associated agent
-for obj in asnake.utils.walk_tree(resource, client):
+    for row in reader:
 
-    agents = obj.get("linked_agents")
+        # Isolate the resource to be worked on
+        resource = client.get(f'{row[0]}').json()
+        agents = resource.get("linked_agents")
 
-    # Loop through list of agents attached to an archival object
-    for agent in agents:
-        if agent.get("relator") is None:
+        # Loop through list of agents attached to an archival object
+        for agent in agents:
+            if agent.get("relator") is None:
 
-            if agent.get("ref") in PHOTOGRAPHERS:
-                agent["relator"] = "Photographer"
-                agent["role"] = "creator"
+                if agent.get("ref") == row[1]:
+                    agent["relator"] = row[2]
 
-                # Post update
-                updated = client.post(obj['uri'], json=obj)
+                    # Post update
+                    updated = client.post(resource['uri'], json=resource)
 
-                if updated.status_code == 200:
-                    print("Archival object {} updated".format(obj['uri']))
-                else:
-                    print(updated.json())
+                    if updated.status_code != 200:
+                        print(updated.json())
+
 
 # Hang up
 client.session.close()

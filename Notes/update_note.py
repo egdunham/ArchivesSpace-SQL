@@ -10,7 +10,7 @@ client.authorize()
 
 
 # Set file of names to search
-archival_object_csv = os.path.normpath(r"C:\Users\egdunham\OneDrive - Arizona State University/Desktop/input.csv")
+archival_object_csv = os.path.normpath(r"C:\Users\egdunham\Desktop\input.csv")
 
 
 with open(archival_object_csv,'r', encoding='utf-8-sig') as csvin:
@@ -21,20 +21,14 @@ with open(archival_object_csv,'r', encoding='utf-8-sig') as csvin:
     for row in reader:
         id = row[0]
 
-        ao = client.get(f"{id}").json()
+        ao = client.get(f"/repositories/2/archival_objects/{id}").json()
         note = ao.get("notes")
 
         for item in note:
-            if item["type"] == "physdesc":
-                item["content"] = [row[1]]
-
-
-
-
-
-
-
-
+            if item["type"] == "separatedmaterial":
+                subnote = item.get("subnotes")
+                for item in subnote:
+                    item["content"] = row[1]
 
         # Post updates
         updated = client.post(ao["uri"], json=ao)

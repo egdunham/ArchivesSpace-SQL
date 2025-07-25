@@ -33,7 +33,7 @@ with open(archival_object_csv,'r') as csvfile:
             'notes': [],
             'level': 'file',
             'title': row[0],
-            'parent': {'ref': f'/repositories/{repo}/archival_objects/1262229'},
+            'parent': {'ref': f'/repositories/{repo}/archival_objects/1263521'},
             'resource': {'ref': f'/repositories/{repo}/resources/{guide}'}
         }
 
